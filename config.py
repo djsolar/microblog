@@ -4,6 +4,8 @@ __author__ = 'zhouyiran'
 import os
 
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 CSRF_ENABLED = True
 SECRET_KEY = "a hard string"
 
@@ -15,7 +17,6 @@ OPENID_PROVIDERS = [
     {'name': 'MyOpenID', 'url': 'https://www.myopenid.com'},
 ]
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-SQLALCHEMY_DATABASE_URI = 'sqlite:////' + os.path.join(basedir, 'app.db')
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 SQLALCHEMY_TRACK_MODIFICATIONS = True
