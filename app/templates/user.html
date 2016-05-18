@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+    <table valign="top">
+        <tr>
+            <td><img src="{{ user.avatar(128) }}"></td>
+            <td>
+                <h1>User: {{ user.nickname }}</h1>
+                {% if user.about_me %}
+                    <p>{{ g.user.about_me }}</p>
+                {% endif %}
+                {% if user.last_seen %}
+                    <p><i>Last seen on: {{ user.last_seen }}</i></p>
+                {% endif %}
+                {% if user.id == g.user.id %}
+                    <p><a href="{{ url_for('edit') }}">Edit</a></p>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    {% for post in posts %}
+        <table valign="top">
+            <tr>
+                <td><img src="{{ user.avatar(50) }}" width="50px" height="50px"></td>
+                <td><i>{{ post.author.nickname }} says:</i> <br> <b>{{ post.body }}</b></td>
+            </tr>
+        </table>
+    {% endfor %}
+{% endblock %}
