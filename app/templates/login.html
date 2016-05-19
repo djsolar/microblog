@@ -1,30 +1,55 @@
 {% extends "base.html" %}
 {% block content %}
     <script type="application/javascript">
-    function set_openid(openid, pr) {
-        u = openid.search('<username>')
-        if(u != -1) {
-            user = prompt('Enter your ' + pr + ' username:')
-            openid = openid.substr(0, u) + user
+        function set_openid(openid, pr) {
+            u = openid.search('<username>')
+            if (u != -1) {
+                user = prompt('Enter your ' + pr + ' username:')
+                openid = openid.substr(0, u) + user
+            }
+            form = document.forms['login']
+            form.elements['openid'].value = openid
         }
-        form = document.forms['login']
-        form.elements['openid'].value = openid
-    }
     </script>
-    <h1>Sign In</h1>
-    <form action="" method="post" name="login">
-        {{form.hidden_tag()}}
-        <p>
-            Please input your openID:<br>
-            {{form.openid(size=80)}} <br>
-            {% for error in form.openid.errors %}
-            <span style="color: red">{{ error }}</span>
-            {% endfor %} <br>
-            |{% for pr in providers %}
-                <a href="javascript:set_openid('{{pr.url}}', '{{pr.name}}');">{{pr.name}}</a>|
-            {% endfor %}
-        </p>
-        <p>{{form.remember_me}} Remember Me</p>
-        <p> <input type="submit" value="Sign In"></p>
-    </form>
+    {% include 'flash.html' %}
+
+    <div class="well">
+        <h3>请登录</h3>
+
+        <form class="form" action="" method="post" name="login">
+            {{ form.hidden_tag() }}
+            <div class="help-block">Click on your OpenId provider below:</div>
+            <div class="control-group">
+                {% for pr in providers %}
+                    <a href="javascript:set_openid('{{ pr.url }}', '{{ pr.name }}');">
+                        <img src="/static/img/{{ pr.name.lower()}}.png" class="img-polaroid" style="margin: 2px;">
+                    </a>
+                {% endfor %}
+            </div>
+            <div class="control-group {% if form.errors.openid %} error {% endif %}">
+                <label class="control-label" for="openid">
+                    Or enter your OpenID here:
+                </label>
+                <div class="controls">
+                    {{ form.openid(size=80, class='span4') }}
+                    {% for error in form.errors.openid %}
+                        <span class="help-inline">[{{ error }}]</span><br>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <label class="checkbox" for="remember_me">
+                        {{ form.remember_me }} 记住我
+                    </label>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="controls">
+                    <input class="btn btn-primary" type="submit" value="登录">
+                </div>
+            </div>
+        </form>
+    </div>
 {% endblock %}

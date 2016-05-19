@@ -1,13 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 __author__ = 'zhouyiran'
+from datetime import datetime
+
 from flask import render_template, flash, redirect, url_for, request, g, session
 from app import app, db, lm, oid
 from flask.ext.login import login_required, login_user, logout_user, current_user
 from .forms import LoginForm, EditForm, PostForm, SearchForm
-from models import User, Post, ROLE_USER, ROLE_ADMIN
-from datetime import datetime
+from models import User, Post
 from config import POSTS_PER_PAGE, MAX_SEARCH_RESULTS
+from app.emails import follower_notification
 
 
 @lm.user_loader
@@ -124,6 +126,7 @@ def follow(nickname):
     db.session.add(u)
     db.session.commit()
     flash('You are now following ' + nickname + '!')
+    follower_notification(user, g.user)
     return redirect(url_for('user', nickname=nickname))
 
 
