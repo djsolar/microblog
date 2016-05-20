@@ -13,6 +13,7 @@ OPENID_PROVIDERS = [
     {'name': 'AOL', 'url': 'http://openid.aol.com/<username>'},
     {'name': 'Flickr', 'url': 'http://www.flickr.com/<username>'},
     {'name': 'MyOpenID', 'url': 'https://www.myopenid.com'},
+    {'name': 'QQ', 'url': 'https://graph.z.qq.com/moc2/me'}
 ]
 
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
@@ -35,3 +36,11 @@ POSTS_PER_PAGE = 3
 WHOOSH_BASE = os.path.join(basedir, 'search.db')
 # 搜索结果的数目
 MAX_SEARCH_RESULTS = 50
+
+LANGUAGES = {
+    'es': 'English',
+    'es': 'Español'
+}
+
+MS_TRANSLATOR_CLIENT_ID = ''
+MS_TRANSLATOR_CLIENT_SECRET = ''

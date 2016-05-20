@@ -2,14 +2,22 @@
 # -*- coding: utf-8 -*-
 __author__ = 'zhouyiran'
 from datetime import datetime
-
+from guess_language import guessLanguage
 from flask import render_template, flash, redirect, url_for, request, g, session
-from app import app, db, lm, oid
+from app import app, db, lm, oid, babel
 from flask.ext.login import login_required, login_user, logout_user, current_user
+from flask.ext.babel import gettext
 from .forms import LoginForm, EditForm, PostForm, SearchForm
 from models import User, Post
-from config import POSTS_PER_PAGE, MAX_SEARCH_RESULTS
+from config import POSTS_PER_PAGE, MAX_SEARCH_RESULTS, LANGUAGES
 from app.emails import follower_notification
+from translate import microsoft_translate
+from flask import jsonify
+
+
+@babel.localeselector
+def get_locale():
+    return 'es'
 
 
 @lm.user_loader
@@ -25,6 +33,7 @@ def before_request():
         db.session.add(g.user)
         db.session.commit()
         g.search_form = SearchForm()
+    g.locale = get_locale()
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -34,7 +43,11 @@ def before_request():
 def index(page=1):
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(body=form.post.data, timestamp=datetime.utcnow(), author=g.user)
+        language = guessLanguage(form.post.data)
+        if language == 'UNKNOWN' or len(language) > 5:
+            language = ''
+        print 'language = ', language
+        post = Post(body=form.post.data, timestamp=datetime.utcnow(), author=g.user,language=language)
         db.session.add(post)
         db.session.commit()
         flash('Your post is now lived!')
@@ -165,7 +178,7 @@ def internal_error(error):
 @oid.after_login
 def after_login(resp):
     if resp.email is None or resp.email == '':
-        flash('Invalid login. Please try again.')
+        flash(gettext('Invalid login. Please try again.'))
         return redirect(url_for('login'))
     user = User.query.filter_by(email=resp.email).first()
     if user is None:
@@ -184,3 +197,11 @@ def after_login(resp):
         session.pop('remember_me', None)
     login_user(user, remember=remember_me)
     return redirect(request.args.get('next') or url_for('index'))
+
+
+@app.route('/translate', methods=['POST'])
+@login_required
+def translate():
+    return jsonify({'text':microsoft_translate(request.form['text'],
+                                               request.form['sourceLang'],
+                                               request.form['destLang'])})
